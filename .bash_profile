@@ -23,14 +23,16 @@ shopt -s histappend
 prompt_command() {
     local RC="$?"
     local Default="\[\e[0m\]"
-    local Red="\[\e[1;31m\]"
-    local Green="\[\e[1;32m\]"
-    local Blue="\[\e[1;34m\]"
-    PS1="${Green}"
+    local Red="\[\e[30;41m\]"
+    local Green="\[\e[30;42m\]"
+    local Yellow="\[\e[30;43m\]"
+    local Blue="\[\e[37;44m\]"
+    PS1=""
     if [ -n "$VIRTUAL_ENV" ]; then
+        PS1+="${Yellow}"
         PS1+='($(basename "$VIRTUAL_ENV")) '
     fi
-    PS1+="\h:${Blue}\w"
+    PS1+="${Green}\h:${Blue}\w"
     local git_status=""
     local git_branch=""
     git_branch=$(git branch --show-current 2>/dev/null)
