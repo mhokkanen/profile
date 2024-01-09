@@ -1,2 +1,2 @@
 # profile
-Various profiles used for testing.
+Various shell profile examples for reference.
