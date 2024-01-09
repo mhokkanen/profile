@@ -76,8 +76,30 @@ function ldp { kerb; /usr/bin/ldapsearch -o ldif-wrap=no -LLL -Q "$@" 2>&1; }
 function ls { LC_COLLATE=C /usr/bin/ls --color "$@"; }
 function moon { curl http://wttr.in/Moon; }
 function papply { puppet apply manifests/site.pp --modulepath=modules; }
-function pb-query {
-    curl -s -X GET http://puppetboardserver:8080/pdb/query/v4/facts --data-urlencode 'query=["=", "name", "application"]' | jq
+puppet_query_api="https://puppetdb:8081/pdb/query/v4/"
+function pdb-apps {
+    local entity=facts
+    local endpoint="${puppet_query_api}${entity}"
+    curl -k -s -G "${endpoint}" --data-urlencode 'query=["=", "name", "application"]' | jq .
+}
+function pdb-facts {
+    local hostname="$1"
+    local entity=facts
+    local endpoint="${puppet_query_api}${entity}"
+    curl -k -s -G "${endpoint}" --data-urlencode 'query=["=", "certname", "'${hostname}'"]' | jq .
+}
+function pdb-reports {
+    local entity=reports
+    local endpoint="${puppet_query_api}${entity}"
+    curl -k -s -G "${endpoint}" | jq .
+}
+function port2pid {
+    if [[ $(id -u) != 0 ]]; then
+        echo "root privileges required to see detailed process information."
+    fi
+    ss -tulpn "sport = :$1"
+    # netstat -tulpn | grep $1
+    # lsof -i :$1
 }
 function python-outdated { pip list --outdated; }
 function python-profile { python3 -m cProfile "$1"; }
@@ -153,4 +175,3 @@ function whatsmyip { curl -s http://whatismyip.akamai.com/; }
 
 # diff <(ssh -q hostname1 cat /etc/sudoers) <(ssh -q hostname2 cat /etc/sudoers)
 
-# lsof -i :80
