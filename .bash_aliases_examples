@@ -6,6 +6,13 @@ function awsii { curl http://169.254.169.254/latest/dynamic/instanance-identity/
 function azmeta {
     curl -s -H Metadata:true "http://169.254.169.254/metadata/instance?api-version=2023-07-01" | jq
 }
+function cat {
+    if type -P pygmentize >/dev/null; then
+        pygmentize -g "$@"
+    else
+        /usr/bin/cat "$@"
+    fi
+}
 function cert_rehash {
     if [[ $# -ne 1 ]]; then
         echo "usage: cert_rehash <certificate.pem>"
@@ -67,8 +74,6 @@ function kerb { if ! klist -s; then kinit; fi; }
 function ldapservers { host -t srv _ldap._tcp.domain.com; }
 function ldp { kerb; /usr/bin/ldapsearch -o ldif-wrap=no -LLL -Q "$@" 2>&1; }
 function ls { LC_COLLATE=C /usr/bin/ls --color "$@"; }
-function site { host -t srv _ldap._tcp.Site-Name._sites.domain.com; }
-function sitestar { ldp -b cn=configuration,dc=domain,dc=com "(&(objectClass='site')(cn=Site-*))"; }
 function moon { curl http://wttr.in/Moon; }
 function papply { puppet apply manifests/site.pp --modulepath=modules; }
 function pb-query {
@@ -83,6 +88,7 @@ function rpmcontents { rpm -q -l -p "$1"; }
 function rpmscripts { rpm -q --scripts -p "$1"; }
 function rpmtriggers { rpm -q --triggers -p "$1"; }
 function rpmextract { rpm2cpio "$1" | cpio -idmv; }
+function site { host -t srv _ldap._tcp.Site-Name._sites.domain.com; }
 function sitedcs {
     host -t any "_ldap._tcp.${1}._sites.domain.com"
 }
@@ -90,6 +96,7 @@ function sites {
     kerb
     ldp -E pr=1000/noprompt -b cn=configuration,dc=domain,dc=com objectClass="site"
 }
+function sitestar { ldp -b cn=configuration,dc=domain,dc=com "(&(objectClass='site')(cn=Site-*))"; }
 function ssh {
     /usr/bin/ssh -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o GSSAPIAuthentication=yes \
                  -o GSSAPIDelegateCredentials=yes -o ForwardAgent=yes -o ForwardX11=yes \
