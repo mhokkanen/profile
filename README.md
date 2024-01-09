@@ -1,2 +1,2 @@
 # profile
-bash profile
+Various profiles used for testing.
